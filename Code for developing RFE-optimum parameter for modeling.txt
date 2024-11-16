@@ -1,0 +1,33 @@
+# Install and load required libraries
+install.packages("randomForest")
+library(caret)
+library(glmnet)
+library(tidyverse)
+library(readr)
+library(randomForest)
+
+# Set working directory
+path <- "D:/Education/Water journal-2/LSTM"
+setwd(path)
+
+# Read the data
+my_data <- read_csv("IRANT.csv")
+
+# Specify the target variables and predictors
+targets <- c("B")
+predictors <- setdiff(names(my_data), targets)
+
+# Create a randomForest model to get importance scores
+rf_model <- randomForest(x = my_data[predictors], y = my_data[[targets]], importance = TRUE, ntree = 500)
+
+# Extract importance scores
+importance_scores <- importance(rf_model)
+
+# Create a data frame of variable names and their importance scores
+importance_df <- data.frame(Variable = rownames(importance_scores), Importance = importance_scores[, 1])
+
+# Rank the variables by importance
+importance_df <- importance_df %>% arrange(desc(Importance))
+
+# Print the ranked variables with their importance scores
+print(importance_df)
